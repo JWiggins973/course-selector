@@ -1,29 +1,24 @@
-# ABCU Course Planner
+# Course Planner — Enhancements
 
-A command-line course planning tool that loads course data from a CSV file
-and allows users to search and sort courses in the ABCU Computer Science program.
-
-## Original C++ Implementation
-
-### Data Structures Used
-- `std::vector` — stores all course objects
-- `std::set` — validates prerequisite course codes
-- Custom quicksort — sorts courses alphabetically by course code at print time
-
-### Algorithm Complexity
-- Loading: O(n)
-- Sorting: O(n log n) — quicksort
-- Search: O(n) — linear scan through vector
-- Prerequisite validation: O(log n) — set lookup
-
-### Features
-- Load courses from CSV file
-- Sort and print all courses alphabetically
-- Search for a specific course by course code
-- Prerequisite validation on load
+## C++ Enhancement
+### Changes from Original
+- Replaced `std::vector` + `std::set` with `unordered_map` for O(1) lookups
+- Added recursive prerequisite chain function
 
 ### Build & Run
-```bash
 g++ -std=c++17 main.cpp dataStructureFunctions.cpp -o course-selector
 ./course-selector
 
+## Angular Application
+### Features
+- Searchable course cards grid
+- Color coded by prerequisite count (green = none, yellow = 1, red = 2+)
+- Prerequisite chain detail panel
+- Progress path visualization — shows what courses this unlocks
+
+### Run Locally
+cd course-planner
+ng serve
+
+### Live Demo
+[GitHub Pages link coming Soon]

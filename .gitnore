@@ -1,0 +1,17 @@
+# C++ build artifacts
+*.o
+*.out
+a.out
+course-selector
+
+# Angular
+node_modules/
+dist/
+.angular/
+.env
+
+# Mac
+.DS_Store
+
+# VS Code
+.vscode/
