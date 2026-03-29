@@ -1,0 +1,36 @@
+<div class="app-container">
+
+  <!-- App header -->
+  <header>
+    <h1>ABCU Course Planner</h1>
+    <p>Search for a course to see prerequisites and unlock paths</p>
+  </header>
+
+  <!-- Search bar component -->
+  <app-search-bar (searchChanged)="onSearch($event)"></app-search-bar>
+
+  <!-- Color coding legend -->
+  <div class="legend">
+    <span class="legend-item green">🟢 No prerequisites</span>
+    <span class="legend-item yellow">🟡 1 prerequisite</span>
+    <span class="legend-item red">🔴 2+ prerequisites</span>
+  </div>
+
+  <!-- Cards grid — only shows when search has results -->
+  <div class="cards-grid" *ngIf="filteredCourses.length > 0">
+    <app-course-card
+      *ngFor="let course of filteredCourses"
+      [course]="course"
+      (selected)="onCourseSelected($event)">
+    </app-course-card>
+  </div>
+
+  <!-- Empty state — shown before searching -->
+  <div class="empty-state" *ngIf="filteredCourses.length === 0">
+    <p>Start typing to search for courses</p>
+  </div>
+
+  <!-- Detail panel — only shows when a card is clicked -->
+  <app-course-detail [course]="selectedCourse"></app-course-detail>
+
+</div>
