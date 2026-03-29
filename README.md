@@ -1,22 +1,29 @@
-# Course Planner — Enhancements
+# ABCU Course Planner — Enhanced
 
-## C++ Enhancement
-### Changes from Original
-- Replaced `std::vector` + `std::set` with `unordered_map` for O(1) lookups
-- Added recursive prerequisite chain function
+Original C++ course planner rebuilt as an Angular web app with improved 
+data structures and algorithms.
 
-### Build & Run
-g++ -std=c++17 main.cpp dataStructureFunctions.cpp -o course-selector
-./course-selector
+## Improvements Over Original C++
 
-## Angular Application
-### Features
-- Searchable course cards grid
-- Color coded by prerequisite count (green = none, yellow = 1, red = 2+)
-- Prerequisite chain detail panel
-- Progress path visualization — shows what courses this unlocks
+**Data Structure**
+- Replaced `vector` + `set` with `Map` — O(1) lookups vs O(n) and O(log n)
 
-### Run Locally
+**Algorithms**
+- Topological sort replaces alphabetical quicksort — orders by dependency
+- Recursive prerequisite chain — shows everything needed before a course
+- Recursive unlock path — shows what a course opens up
+- Memoization cache — repeat lookups are O(1)
+
+## App Features
+- Search courses in real time
+- Cards color coded by difficulty
+  - 🟢 No prerequisites
+  - 🟡 1 prerequisite
+  - 🔴 2+ prerequisites
+- Click a card to see prerequisite chain and unlock path
+
+## Run Locally
+```bash
 cd course-planner
 ng serve
 
