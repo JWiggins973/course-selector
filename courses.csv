@@ -1,0 +1,34 @@
+courseId,title,prereqs,description
+ENGL101,English Composition I,,Develops foundational writing skills including essay structure and academic argument
+ENGL102,English Composition II,ENGL101,Builds on Composition I with research-based writing and advanced rhetorical analysis
+COMM110,Public Speaking,,Covers the principles of effective oral communication and presentation techniques
+PSYC101,Introduction to Psychology,,Survey of core topics including cognition; behavior; perception; and human development
+HIST101,World History,,Examines major civilizations and global events from antiquity through the modern era
+PHIL101,Introduction to Ethics,,Explores ethical theories and applies them to real-world moral problems
+MATH111,Calculus I,,Covers limits; derivatives; and an introduction to integration
+MATH112,Calculus II,MATH111,Covers integration techniques; sequences; series; and an introduction to differential equations
+MATH201,Discrete Mathematics,MATH111,Covers logic; set theory; graph theory; and proof techniques relevant to computer science
+MATH220,Linear Algebra,MATH111,Covers vectors; matrices; linear transformations; and eigenvalues
+MATH301,Statistics and Probability,MATH112,Covers probability theory; distributions; hypothesis testing; and statistical inference
+MATH310,Differential Equations,MATH112,Covers ordinary differential equations and their applications in science and engineering
+PHYS101,Physics I - Mechanics,MATH111,Covers kinematics; Newton's laws; energy; momentum; and rotational motion
+PHYS102,Physics II - Electricity and Magnetism,"PHYS101|MATH112",Covers electric fields; circuits; magnetic fields; and an introduction to Maxwell's equations
+CSCI100,Introduction to Computer Science,,Broad introduction to computing concepts; problem solving; and the history of the field
+CSCI101,Programming in C++,CSCI100,Introduces programming fundamentals using C++ including variables; loops; and functions
+CSCI200,Data Structures,CSCI101,Covers arrays; linked lists; stacks; queues; trees; and hash maps
+CSCI201,Object-Oriented Programming,CSCI101,Covers classes; inheritance; polymorphism; and design principles using C++
+CSCI300,Introduction to Algorithms,"CSCI200|MATH201",Covers algorithm design; complexity analysis; sorting; searching; and graph algorithms
+CSCI301,Advanced Programming in C++,CSCI101,Covers memory management; pointers; templates; and the C++ standard library
+CSCI310,Computer Organization,CSCI101,Covers digital logic; CPU architecture; memory hierarchy; and assembly language basics
+CSCI320,Database Systems,CSCI200,Covers relational models; SQL; normalization; transactions; and database design
+CSCI350,Operating Systems,CSCI300,Covers processes; threads; scheduling; memory management; and file systems
+CSCI360,Software Engineering,CSCI301,Covers the software development lifecycle; design patterns; testing; and project management
+CSCI370,Programming Languages,CSCI300,Surveys language paradigms including functional; logic; and object-oriented approaches
+CSCI400,Large Software Development,"CSCI301|CSCI350",Capstone-style team project course focused on building and maintaining large codebases
+CSCI410,Artificial Intelligence,"CSCI300|MATH301",Covers search algorithms; knowledge representation; planning; and machine learning basics
+CSCI420,Machine Learning,"CSCI410|MATH220",Covers supervised and unsupervised learning; neural networks; and model evaluation
+CSCI430,Computer Networks,CSCI350,Covers the OSI model; TCP/IP; routing; DNS; and network security fundamentals
+CSCI450,Computer Graphics,"CSCI300|MATH220",Covers rendering pipelines; transformations; shading; and an introduction to OpenGL
+CSCI460,Compiler Design,"CSCI370|CSCI300",Covers lexical analysis; parsing; semantic analysis; and code generation
+CSCI490,Senior Capstone I,CSCI400,First semester of a two-part capstone; focused on project planning and initial implementation
+CSCI495,Senior Capstone II,CSCI490,Completion and presentation of the senior capstone project with industry review
