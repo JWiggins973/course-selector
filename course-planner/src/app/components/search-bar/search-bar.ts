@@ -1,18 +1,19 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, Output, EventEmitter } from '@angular/core';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [ReactiveFormsModule],
   template: `
     <div class="search-container">
       <input
         type="text"
-        [(ngModel)]="query"
-        (ngModelChange)="onSearch($event)"
+        [formControl]="searchControl"
         placeholder="Search by course ID or title..."
+        aria-label="Search courses"
         class="search-input"
       />
     </div>
@@ -26,27 +27,30 @@ import { FormsModule } from '@angular/forms';
       width: 100%;
       padding: 12px 16px;
       font-size: 16px;
-      border: 2px solid #ddd;
+      border: 2px solid var(--border);
       border-radius: 8px;
       outline: none;
       box-sizing: border-box;
+      background: var(--bg-card);
+      color: var(--text-primary);
     }
-    /* Highlight border when input is focused */
     .search-input:focus {
-      border-color: #4a90e2;
+      border-color: var(--accent);
     }
   `]
 })
 export class SearchBarComponent {
 
-  // Current value of the search input
-  query = '';
+  searchControl = new FormControl('');
 
-  // Sends search text up to the parent on every keystroke
   @Output() searchChanged = new EventEmitter<string>();
 
-  // Called on every keystroke — sends current query to parent
-  onSearch(value: string) {
-    this.searchChanged.emit(value);
+  constructor() {
+    // Emits only after the user stops typing for 150ms and the value has changed
+    this.searchControl.valueChanges.pipe(
+      debounceTime(150),
+      distinctUntilChanged(),
+      takeUntilDestroyed()
+    ).subscribe(value => this.searchChanged.emit(value ?? ''));
   }
 }

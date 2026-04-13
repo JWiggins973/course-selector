@@ -1,26 +1,35 @@
-/* Main app wrapper */
+/* Centered content wrapper */
 .app-container {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 24px;
-  font-family: 'Segoe UI', sans-serif;
+  padding: 0 24px;
+  background: color-mix(in srgb, var(--bg-primary) 80%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  min-height: 100vh;
 }
 
 /* Header */
 header {
-  text-align: center;
-  margin-bottom: 10px;
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
 
 header h1 {
-  font-size: 32px;
-  color: #2c3e50;
-  margin-bottom: 6px;
-}
-
-header p {
-  color: #777;
-  font-size: 15px;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
 }
 
 /* Legend */
@@ -29,6 +38,7 @@ header p {
   gap: 16px;
   margin-bottom: 20px;
   font-size: 13px;
+  flex-wrap: wrap;
 }
 
 .legend-item {
@@ -36,11 +46,11 @@ header p {
   border-radius: 12px;
 }
 
-.legend-item.green { background: #d4edda; }
-.legend-item.yellow { background: #fff3cd; }
-.legend-item.red { background: #f8d7da; }
+.legend-item.green  { background: var(--color-green-bg);  color: var(--color-green-text); }
+.legend-item.yellow { background: var(--color-yellow-bg); color: var(--color-yellow-text); }
+.legend-item.red    { background: var(--color-red-bg);    color: var(--color-red-text); }
 
-/* Cards grid */
+/* Cards grid — horizontal wrap */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -51,7 +61,7 @@ header p {
 /* Empty state */
 .empty-state {
   text-align: center;
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 15px;
   margin-top: 40px;
 }

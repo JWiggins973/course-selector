@@ -1,89 +1,96 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { Course } from '../../services/course';
 
 @Component({
   selector: 'app-course-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgClass],
   template: `
     <div class="card" [ngClass]="course.level" (click)="onSelect()">
-      <!-- Course ID  -->
+      <div class="card-top-bar"></div>
       <h3 class="course-id">{{ course.courseId }}</h3>
-      <!-- Course title -->
       <p class="course-title">{{ course.title }}</p>
-      <!-- Badge showing prereq count -->
-      <span class="badge">
-        {{ course.prereqs.length === 0 ? 'No prereqs' : course.prereqs.length + ' prereq(s)' }}
-      </span>
+      <span class="badge">{{ prereqLabel }}</span>
     </div>
   `,
   styles: [`
-    /* Base card styles */
     .card {
       padding: 16px;
       border-radius: 10px;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 2px solid transparent;
+      border: 1px solid transparent;
+      transition: transform 0.15s, box-shadow 0.15s;
+      background: var(--bg-surface);
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Lift card on hover */
+    /* Colored strip along the top of each card */
+    .card-top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
     .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     }
 
-    /* Green - entry level, no prereqs */
-    .green {
-      background-color: #d4edda;
-      border-color: #28a745;
-    }
+    /* Green — no prereqs */
+    .green { border-color: var(--color-green-border); background: color-mix(in srgb, var(--color-green-tint) 10%, var(--bg-surface)); }
+    .green .card-top-bar { background: var(--color-green-text); }
+    .green .badge { background: var(--color-green-bg); color: var(--color-green-text); }
 
-    /* Yellow - intermediate, 1 prereq */
-    .yellow {
-      background-color: #fff3cd;
-      border-color: #ffc107;
-    }
+    /* Yellow — 1 prereq */
+    .yellow { border-color: var(--color-yellow-border); background: color-mix(in srgb, var(--color-yellow-tint) 10%, var(--bg-surface)); }
+    .yellow .card-top-bar { background: var(--color-yellow-text); }
+    .yellow .badge { background: var(--color-yellow-bg); color: var(--color-yellow-text); }
 
-    /* Red - advanced, 2+ prereqs */
-    .red {
-      background-color: #f8d7da;
-      border-color: #dc3545;
-    }
+    /* Red — 2+ prereqs */
+    .red { border-color: var(--color-red-border); background: color-mix(in srgb, var(--color-red-tint) 10%, var(--bg-surface)); }
+    .red .card-top-bar { background: var(--color-red-text); }
+    .red .badge { background: var(--color-red-bg); color: var(--color-red-text); }
 
+    /* Monospace for course ID */
     .course-id {
-      margin: 0 0 6px 0;
-      font-size: 18px;
-      font-weight: bold;
+      margin: 8px 0 6px 0;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Space Mono', monospace;
+      color: var(--text-primary);
     }
 
     .course-title {
-      margin: 0 0 10px 0;
-      font-size: 14px;
-      color: #333;
+      margin: 0 0 12px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
     }
 
-    /* Small pill style badge showing prereq count */
+    /* Prereq count pill */
     .badge {
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.1);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
     }
   `]
 })
 export class CourseCardComponent {
 
-  // Course data passed in from parent
-  @Input() course!: Course;
+  @Input({ required: true }) course!: Course;
 
-  // Notifies parent when this card is clicked
   @Output() selected = new EventEmitter<Course>();
 
-  // Emit the course object up to the parent
+  get prereqLabel(): string {
+    return this.course.prereqs.length === 0
+      ? 'No prereqs'
+      : `${this.course.prereqs.length} prereq(s)`;
+  }
+
   onSelect() {
     this.selected.emit(this.course);
   }
 }
-

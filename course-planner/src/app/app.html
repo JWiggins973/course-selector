@@ -1,36 +1,49 @@
 <div class="app-container">
 
-  <!-- App header -->
+  <!-- App header — always visible -->
   <header>
-    <h1>ABCU Course Planner</h1>
-    <p>Search for a course to see prerequisites and unlock paths</p>
+    <div class="eyebrow">ABCU</div>
+    <h1>Course Planner</h1>
   </header>
 
-  <!-- Search bar component -->
-  <app-search-bar (searchChanged)="onSearch($event)"></app-search-bar>
+  <!-- Search view — shown when no course is selected -->
+  @if (!selectedCourse) {
+    <div class="search-view">
 
-  <!-- Color coding legend -->
-  <div class="legend">
-    <span class="legend-item green">🟢 No prerequisites</span>
-    <span class="legend-item yellow">🟡 1 prerequisite</span>
-    <span class="legend-item red">🔴 2+ prerequisites</span>
-  </div>
+      <app-search-bar (searchChanged)="onSearch($event)"></app-search-bar>
 
-  <!-- Cards grid — only shows when search has results -->
-  <div class="cards-grid" *ngIf="filteredCourses.length > 0">
-    <app-course-card
-      *ngFor="let course of filteredCourses"
-      [course]="course"
-      (selected)="onCourseSelected($event)">
-    </app-course-card>
-  </div>
+      <!-- Color coding legend -->
+      <div class="legend">
+        <span class="legend-item green">No prerequisites</span>
+        <span class="legend-item yellow">1 prerequisite</span>
+        <span class="legend-item red">2+ prerequisites</span>
+      </div>
 
-  <!-- Empty state — shown before searching -->
-  <div class="empty-state" *ngIf="filteredCourses.length === 0">
-    <p>Start typing to search for courses</p>
-  </div>
+      <!-- Cards grid or empty state -->
+      @if (filteredCourses.length > 0) {
+        <div class="cards-grid">
+          @for (course of filteredCourses; track course.courseId) {
+            <app-course-card
+              [course]="course"
+              (selected)="onCourseSelected($event)">
+            </app-course-card>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>{{ searchQuery ? 'No results found' : 'Start typing to search for courses' }}</p>
+        </div>
+      }
 
-  <!-- Detail panel — only shows when a card is clicked -->
-  <app-course-detail [course]="selectedCourse"></app-course-detail>
+    </div>
+  }
+
+  <!-- Detail view — shown when a course is selected -->
+  @if (selectedCourse) {
+    <app-course-detail
+      [course]="selectedCourse"
+      (back)="onBack()">
+    </app-course-detail>
+  }
 
 </div>
