@@ -1,3 +1,5 @@
+// Loads courses.csv and provides search, prereq chain, and unlock path lookups.
+// Author: Jermaine Wiggins
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
@@ -16,25 +18,20 @@ export interface Course {
 })
 export class CourseService {
 
-  // Map replaces C++ vector + set
-  // vector search was O(n), set lookup was O(log n)
-  // Map lookup is O(1) — faster at any scale
+  // Map replaces C++ vector + set; lookup is O(1) vs O(n) vector scan or O(log n) set lookup.
   private courseMap = new Map<string, Course>();
 
-  // Reverse adjacency map — courseId -> courses that require it
-  // Built once at load time so getUnlockPath traversal is O(n + e) instead of O(n²)
+  // Reverse adjacency map: courseId -> ids of courses that require it.
+  // Built once so getUnlockPath is O(1) lookup instead of O(n) scan.
   private reverseMap = new Map<string, string[]>();
 
-  // Lazy cache — stores results after first computation
-  // Only caches courses the user actually clicks for memory efficiency
-  // First click: O(n + e), repeat click: O(1)
+  // Lazy cache: populated on first traversal, O(1) on repeat.
   private prereqCache = new Map<string, Course[]>();
   private fullChainCache = new Map<string, Course[]>();
 
   constructor(private http: HttpClient) {}
 
-  // Reads CSV and stores each course in the Map
-  // Runs once — O(n) to build, O(1) to access after
+  // Parses courses.csv into the map and builds the reverse adjacency index.
   loadCourses() {
     return this.http.get('courses.csv', { responseType: 'text' }).pipe(
       map(csv => {
@@ -42,28 +39,14 @@ export class CourseService {
         this.reverseMap.clear();
         this.prereqCache.clear();
         this.fullChainCache.clear();
-        const lines = csv.trim().split('\n').slice(1); // skip header
-        lines.forEach(line => {
-          const parts = line.split(',');
-          if (parts.length < 3) return; // skip malformed lines
-          const courseId = parts[0].trim();
-          const title = parts[1].trim();
-          const prereqStr = parts[2];
-          const description = parts.slice(3).join(',').trim(); // rejoin tail so commas in descriptions are preserved
-          const prereqs = prereqStr
-            ? prereqStr.replace(/"/g, '').split('|').filter(p => p.trim())
-            : [];
-          // Level computed from prereq count — not stored in CSV
-          const level = prereqs.length === 0 ? 'green'
-                      : prereqs.length === 1  ? 'yellow'
-                      : 'red';
-          const course: Course = { courseId, title, description, prereqs, level };
-          this.courseMap.set(courseId, course);
-
-          // Add this course to each prereq's reverse map entry
-          prereqs.forEach(prereq => {
+        csv.trim().split('\n').slice(1).forEach(line => {
+          const course = this._parseLine(line);
+          if (!course) return;
+          this.courseMap.set(course.courseId, course);
+          // Index this course under each of its prereqs for reverse lookup
+          course.prereqs.forEach(prereq => {
             const existing = this.reverseMap.get(prereq) ?? [];
-            existing.push(courseId);
+            existing.push(course.courseId);
             this.reverseMap.set(prereq, existing);
           });
         });
@@ -72,52 +55,45 @@ export class CourseService {
     );
   }
 
-  // O(1) lookup by course ID
-  // Original C++ scanned the entire vector — O(n)
+  // Parses one CSV line into a Course. Returns null for malformed lines.
+  private _parseLine(line: string): Course | null {
+    const parts = line.split(',');
+    if (parts.length < 3) return null;
+    const courseId = parts[0].trim();
+    const title = parts[1].trim();
+    const prereqs = parts[2]
+      ? parts[2].replace(/"/g, '').split('|').filter(p => p.trim())
+      : [];
+    const description = parts.slice(3).join(',').trim(); // rejoin so commas inside descriptions are preserved
+    const level = prereqs.length === 0 ? 'green'
+                : prereqs.length === 1 ? 'yellow'
+                : 'red';
+    return { courseId, title, description, prereqs, level };
+  }
+
+  // O(1) map lookup vs O(n) vector scan in original C++.
   getCourse(courseId: string): Course | undefined {
     return this.courseMap.get(courseId);
   }
 
-  // Walks up the prereq chain recursively
-  // First click: O(n + e) — computes and caches result
-  // Repeat click: O(1) — reads from cache
+  // Returns all prereqs in order, most basic first. Cached after the first call.
+  // getFullChain already builds the right order — this just drops the selected course at the end.
   getPrereqChain(courseId: string): Course[] {
     if (this.prereqCache.has(courseId)) return this.prereqCache.get(courseId)!;
-
-    const visited = new Set<string>();
-    const traverse = (id: string): Course[] => {
-      if (visited.has(id)) return [];
-      visited.add(id);
-      const course = this.courseMap.get(id);
-      if (!course) return [];
-      const chain: Course[] = [];
-      for (const prereq of course.prereqs) {
-        const prereqCourse = this.courseMap.get(prereq);
-        if (prereqCourse) {
-          chain.push(prereqCourse);
-          chain.push(...traverse(prereq));
-        }
-      }
-      return chain;
-    };
-
-    const result = traverse(courseId);
-    this.prereqCache.set(courseId, result);
-    return result;
+    const chain = this.getFullChain(courseId).slice(0, -1);
+    this.prereqCache.set(courseId, chain);
+    return chain;
   }
 
-  // Returns courses that directly list this course as a prereq
-  // Uses reverse adjacency map for O(1) lookup — no recursion needed
+  // Returns courses that list this course as a direct prereq.
   getUnlockPath(courseId: string): Course[] {
     return (this.reverseMap.get(courseId) ?? [])
       .map(depId => this.courseMap.get(depId))
       .filter((c): c is Course => c !== undefined);
   }
 
-  // Builds the full ordered path from zero to the selected course
-  // Walks prereqs recursively then adds the course itself — topological order
-  // First click: O(n + e) — computes and caches result
-  // Repeat click: O(1) — reads from cache
+  // Full step-by-step path to this course, starting from courses with no prereqs.
+  // Cached after the first call.
   getFullChain(courseId: string): Course[] {
     if (this.fullChainCache.has(courseId)) return this.fullChainCache.get(courseId)!;
 
@@ -129,7 +105,7 @@ export class CourseService {
       visited.add(id);
       const course = this.courseMap.get(id);
       if (!course) return;
-      // Visit prereqs first so they appear before dependents
+      // Visit prereqs first so they appear before the courses that need them
       for (const prereq of course.prereqs) {
         traverse(prereq);
       }
@@ -141,7 +117,7 @@ export class CourseService {
     return chain;
   }
 
-  // Filters courses by ID, title, or description — O(n) scan
+  // Searches all courses by ID, title, or description.
   filterCourses(query: string): Course[] {
     const q = query.toLowerCase();
     return Array.from(this.courseMap.values()).filter(c =>
@@ -151,10 +127,8 @@ export class CourseService {
     );
   }
 
-  // Sorts courses by dependency order — prereqs always before dependents
-  // Replaces original C++ quicksort which sorted alphabetically
-  // Original: O(n log n), ran every time user selected print
-  // Enhanced: O(n + e), runs once at startup
+  // Returns all courses sorted so prereqs always come before the courses that need them.
+  // Replaces the original C++ alphabetical sort; runs once at startup instead of on every print.
   getTopologicalOrder(): Course[] {
     const visited = new Set<string>();
     const result: Course[] = [];

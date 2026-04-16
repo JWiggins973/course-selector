@@ -50,7 +50,18 @@ header h1 {
 .legend-item.yellow { background: var(--color-yellow-bg); color: var(--color-yellow-text); }
 .legend-item.red    { background: var(--color-red-bg);    color: var(--color-red-text); }
 
-/* Cards grid — horizontal wrap */
+/* Error banner */
+.load-error {
+  background: var(--color-red-bg);
+  color: var(--color-red-text);
+  border: 1px solid var(--color-red-text);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Cards grid - horizontal wrap */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

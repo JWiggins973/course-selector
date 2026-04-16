@@ -1,3 +1,5 @@
+// Root component - handles search, course selection, and load errors.
+// Author: Jermaine Wiggins
 import { Component, OnInit } from '@angular/core';
 import { CourseService, Course } from './services/course';
 import { SearchBarComponent } from './components/search-bar/search-bar';
@@ -21,8 +23,9 @@ export class AppComponent implements OnInit {
   filteredCourses: Course[] = [];
   selectedCourse: Course | null = null;
   searchQuery = '';
+  loadError = false;
 
-  // Built once after load — O(n) — used to sort filtered results in topological order
+  // Built once at load to sort filtered results by dependency order.
   private orderMap = new Map<string, number>();
 
   constructor(private courseService: CourseService) {}
@@ -33,21 +36,27 @@ export class AppComponent implements OnInit {
         this.allCourses = this.courseService.getTopologicalOrder();
         this.allCourses.forEach((c, i) => this.orderMap.set(c.courseId, i));
       },
-      error: (err) => console.error('Failed to load courses:', err)
+      error: (err) => {
+        console.error('Failed to load courses:', err);
+        this.loadError = true;
+      }
     });
   }
 
-  // Called on every debounced keystroke from search bar
   onSearch(query: string) {
     this.searchQuery = query.trim();
-    if (this.searchQuery === '') {
+    if (!this.searchQuery) {
       this.filteredCourses = [];
       this.selectedCourse = null;
-    } else {
-      this.filteredCourses = this.courseService
-        .filterCourses(this.searchQuery)
-        .sort((a, b) => (this.orderMap.get(a.courseId) ?? 0) - (this.orderMap.get(b.courseId) ?? 0));
+      return;
     }
+    this.filteredCourses = this.courseService
+      .filterCourses(this.searchQuery)
+      .sort((a, b) => this.orderOf(a.courseId) - this.orderOf(b.courseId));
+  }
+
+  private orderOf(courseId: string): number {
+    return this.orderMap.get(courseId) ?? 0;
   }
 
   onCourseSelected(course: Course) {
@@ -57,5 +66,7 @@ export class AppComponent implements OnInit {
 
   onBack() {
     this.selectedCourse = null;
+    this.filteredCourses = [];
+    this.searchQuery = '';
   }
 }

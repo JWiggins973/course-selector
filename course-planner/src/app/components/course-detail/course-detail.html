@@ -1,0 +1,74 @@
+<div class="detail-container">
+
+  <button class="back-btn" (click)="back.emit()">← Back to results</button>
+
+  <!-- Course ID and title -->
+  <div class="course-eyebrow">{{ course?.courseId }}</div>
+  <h2 class="course-title">{{ course?.title }}</h2>
+  <p class="course-description">{{ course?.description }}</p>
+
+  <!-- Prereqs and unlocks side by side -->
+  <div class="sections">
+
+    <div class="section">
+      <div class="section-label">Prerequisites</div>
+      @if (prereqChain.length > 0) {
+        @for (p of prereqChain; track p.courseId) {
+          <div class="row">
+            <span class="row-id">{{ p.courseId }}</span>
+            <span class="row-title">{{ p.title }}</span>
+          </div>
+        }
+      } @else {
+        <p class="none">No prerequisites</p>
+      }
+    </div>
+
+    <div class="section">
+      <div class="section-label">Unlocks next</div>
+      @if (unlockPath.length > 0) {
+        @for (u of unlockPath; track u.courseId) {
+          <div class="row">
+            <span class="row-id">{{ u.courseId }}</span>
+            <span class="row-title">{{ u.title }}</span>
+          </div>
+        }
+      } @else {
+        <p class="none">No courses unlocked</p>
+      }
+    </div>
+
+  </div>
+
+  <!-- Full course chain from zero to selected course -->
+  <div class="chain-section">
+    <div class="section-label">Complete path to this course</div>
+    <div class="chain">
+      @for (c of fullChain; track c.courseId) {
+        @let isSelected = c.courseId === course?.courseId;
+        <div class="chain-item">
+          <div class="chain-left">
+            <!-- Step number node -->
+            <div class="chain-node" [ngClass]="isSelected ? 'target' : c.level">
+              {{ $index + 1 }}
+            </div>
+            <!-- Connecting line between nodes -->
+            @if (!$last) {
+              <div class="chain-line"></div>
+            }
+          </div>
+          <div class="chain-info">
+            <div class="chain-id">{{ c.courseId }}</div>
+            <div class="chain-course-title">
+              {{ c.title }}
+              @if (isSelected) {
+                <span class="selected-tag">selected</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

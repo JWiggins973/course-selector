@@ -1,12 +1,16 @@
 <div class="app-container">
 
-  <!-- App header — always visible -->
+  @if (loadError) {
+    <div class="load-error">Failed to load course data. Please refresh the page.</div>
+  }
+
+  <!-- App header -->
   <header>
     <div class="eyebrow">ABCU</div>
     <h1>Course Planner</h1>
   </header>
 
-  <!-- Search view — shown when no course is selected -->
+  <!-- Search view shown when no course is selected -->
   @if (!selectedCourse) {
     <div class="search-view">
 
@@ -38,7 +42,7 @@
     </div>
   }
 
-  <!-- Detail view — shown when a course is selected -->
+  <!-- Detail view -->
   @if (selectedCourse) {
     <app-course-detail
       [course]="selectedCourse"

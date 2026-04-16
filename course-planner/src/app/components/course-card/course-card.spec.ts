@@ -41,7 +41,7 @@ describe('CourseCard', () => {
   });
 
   it('should show prereq count for a course with prerequisites', () => {
-    component.course = { ...MOCK_COURSE, prereqs: ['MATH100', 'CSCI090'], level: 'red' };
+    fixture.componentRef.setInput('course', { ...MOCK_COURSE, prereqs: ['MATH100', 'CSCI090'], level: 'red' });
     fixture.detectChanges();
     const badge = fixture.nativeElement.querySelector('.badge') as HTMLElement;
     expect(badge.textContent).toContain('2 prereq(s)');
